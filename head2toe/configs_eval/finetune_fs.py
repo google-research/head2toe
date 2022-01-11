@@ -42,10 +42,6 @@ def get_config(config_string):
                       'finetune_backbones': False,
                   })
           }),
-      # These are used by sur_fs.
-      'is_per_feature': True,
-      'pf_interpolation_coef': 0.5,
-      'pf_interpolation_type': 'constant'
   })
   config['learning'].update(new_learning_config)
   print(f'Config backbone: {config.backbone}')

@@ -20,14 +20,19 @@ from ml_collections import ConfigDict
 
 
 def get_config(config_string):
-  train_batch_size = 100
+  train_batch_size = 128
   eval_batch_size = 50
   config = ConfigDict({
-      'dataset': 'data.svhn',
-      'eval_mode': 'valid',
-      'is_vtab_5fold_valid': True,
-      'seed': 8,
-      'max_num_gpus': 1,
+      'dataset':
+          'data.clevr(task="count_all")',
+      'eval_mode':
+          'valid',
+      'is_vtab_5fold_valid':
+          True,
+      'seed':
+          8,
+      'max_num_gpus':
+          1,
       'learning':
           ConfigDict({
               'optimizer': 'adam',  #  adadelta, adadelta_adaptive, sgd
@@ -42,11 +47,12 @@ def get_config(config_string):
               'training_steps': 500,
               'data_fraction': 1.,
               'cached_eval': True,
-              'use_cosine_decay': False,
+              'use_cosine_decay': True,
               'train_batch_size': train_batch_size,
               'eval_batch_size': eval_batch_size,
               'finetune_backbones': False,
               'finetune_lr_multiplier': 1.,
+              'finetune_steps_multiplier': 1.,
               # ('', 'unit_vector', 'per_feature')
               'feature_normalization': 'unit_vector',
               # nohidden, random_100, random_1000, trainable_100, trainable_1000
@@ -54,7 +60,8 @@ def get_config(config_string):
               'output_head_zeroinit': False,
               'log_freq': 50,
           }),
-      'model_name': 'Finetune'
+      'model_name':
+          'Finetune'
   })
 
   config.backbone = get_backbone_config(config_string)

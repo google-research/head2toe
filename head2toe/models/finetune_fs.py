@@ -96,7 +96,7 @@ class FinetuneFS(finetune_models.Finetune):
         score_fn = getattr(skfs, f_name)
         all_scores = skfs.SelectPercentile(score_fn).fit(
             concat_embeddings, labels).scores_
-    if config_fs.type.startswith('connectivity'):
+    elif config_fs.type.startswith('connectivity'):
       # We don't care about query performance yet.
       new_config = copy.deepcopy(learning_config)
       # We don't do future selection in this innerloop.

@@ -46,7 +46,6 @@ config_flags.DEFINE_config_file('config', lock_config=True)
 
 
 def main(unused_argv):
-
   config = FLAGS.config
   dataset_name = config.dataset
   FLAGS.output_dir = os.path.join(FLAGS.output_dir, dataset_name)
@@ -78,7 +77,6 @@ def main(unused_argv):
   writer = tf.summary.create_file_writer(FLAGS.output_dir)
   writer.set_as_default()
   start_time = time.time()
-  total_episodes_per_datasets = end_idx - start_idx
   for episode_idx in range(start_idx, end_idx):
     t0 = time.perf_counter()
     input_fn = functools.partial(
@@ -112,9 +110,8 @@ def main(unused_argv):
                              query_dataset,
                              fs_dataset=fs_dataset)
     episode_metrics.append(metrics)
-    overall_episode_idx = total_episodes_per_datasets + episode_idx
     logging.info('Episode time %f:', time.perf_counter() - t0)
-    logging.info('Episode: %i', overall_episode_idx)
+    logging.info('Episode: %i', episode_idx)
     logging.info('Average support loss: %f', metrics['support_loss'])
     logging.info('Average support accuracy: %4.2f%%',
                  100 * metrics['support_accuracy'])
@@ -122,12 +119,12 @@ def main(unused_argv):
     logging.info('Average query accuracy: %4.2f%%',
                  100 * metrics['query_accuracy'])
     tf.summary.scalar(
-        'query_accuracy', metrics['query_accuracy'], step=overall_episode_idx)
+        'query_accuracy', metrics['query_accuracy'], step=episode_idx)
 
     pickle_metrics = {}
     for name, value in metrics.items():
       if np.isscalar(value):
-        tf.summary.scalar(f'metrics/{name}', value, step=overall_episode_idx)
+        tf.summary.scalar(f'metrics/{name}', value, step=episode_idx)
       elif name.startswith('pickle'):
         pickle_metrics[name] = value
       else:

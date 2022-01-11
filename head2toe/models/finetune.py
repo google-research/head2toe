@@ -349,7 +349,7 @@ class Finetune(tf.keras.Model):
     return output_head
 
   def evaluate(self, learning_config, support_dataset, query_dataset,
-               unused_fs_dataset=None):
+               **unused_kwargs):
     """Performs evaluation on an episode.
 
     Args:
@@ -431,6 +431,13 @@ class Finetune(tf.keras.Model):
         learning_config['learning_rate'] = new_lr
         logging.info('Finetuning learning rate is updated to %s',
                      new_lr)
+      if (learning_config.finetune_backbones and
+          learning_config.finetune_steps_multiplier != 1.):
+        learning_config = copy.deepcopy(learning_config)
+        new_steps = int(learning_config['training_steps'] *
+                        learning_config.finetune_steps_multiplier)
+        learning_config['training_steps'] = new_steps
+        logging.info('Finetuning training steps are updated to %s', new_steps)
       optimizer = self._get_optimizer(learning_config, num_ways)
       output_head = self._init_training_vars(num_ways, learning_config)
       # Initialize the layer
