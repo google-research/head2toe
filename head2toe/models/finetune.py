@@ -509,6 +509,7 @@ class Finetune(tf.keras.Model):
           tf.distribute.ReduceOp.SUM, pr_acc, axis=None)
       if query_dataset and (i % learning_config.log_freq == 0 or
                             i == (learning_config.training_steps - 1)):
+        logging.info('Evaluating at iteration: %d', i)
         all_losses = []
         all_accs = []
         for query_x, query_y in dist_query_dataset:

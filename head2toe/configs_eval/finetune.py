@@ -24,7 +24,7 @@ def get_config(config_string):
   eval_batch_size = 50
   config = ConfigDict({
       'dataset':
-          'data.clevr(task="count_all")',
+          'data.caltech101',
       'eval_mode':
           'valid',
       'is_vtab_5fold_valid':
@@ -122,5 +122,6 @@ def get_backbone_config(config_string):
 
 
 SINGLE_MODELS = {
-    'imagenetr50': '/tmp/path/',
+    'imagenetr50': ('checkpoints/imagenetr50/', 240),
+    'imagenetvitB16': ('checkpoints/imagenetvitB16/', 224)
 }

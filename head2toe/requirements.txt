@@ -1,3 +1,6 @@
-absl-py==1.0.0
-numpy==1.21.5
+absl-py
+numpy
+ml-collections
+sklearn
+tensorflow==2.7
 -e git+https://github.com/google-research/task_adaptation.git#egg=task_adaptation

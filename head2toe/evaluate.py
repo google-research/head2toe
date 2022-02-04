@@ -112,11 +112,11 @@ def main(unused_argv):
     episode_metrics.append(metrics)
     logging.info('Episode time %f:', time.perf_counter() - t0)
     logging.info('Episode: %i', episode_idx)
-    logging.info('Average support loss: %f', metrics['support_loss'])
-    logging.info('Average support accuracy: %4.2f%%',
+    logging.info('Final support loss: %f', metrics['support_loss'])
+    logging.info('Final support accuracy: %4.2f%%',
                  100 * metrics['support_accuracy'])
-    logging.info('Average query loss: %f', metrics['query_loss'])
-    logging.info('Average query accuracy: %4.2f%%',
+    logging.info('Final query loss: %f', metrics['query_loss'])
+    logging.info('Final query accuracy: %4.2f%%',
                  100 * metrics['query_accuracy'])
     tf.summary.scalar(
         'query_accuracy', metrics['query_accuracy'], step=episode_idx)
