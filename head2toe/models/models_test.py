@@ -14,6 +14,8 @@
 # limitations under the License.
 
 """Trivial tests for checking models evaluates episodes without an error."""
+import absl.testing.parameterized as parameterized
+
 from head2toe.configs_eval import finetune
 from head2toe.configs_eval import finetune_fs
 import head2toe.models.finetune as finetune_models
@@ -21,37 +23,33 @@ import head2toe.models.finetune_fs as finetune_fs_models
 import tensorflow.compat.v2 as tf
 
 
-class FinetuneTest(tf.test.TestCase):
+class FinetuneTest(parameterized.TestCase, tf.test.TestCase):
 
-  def setUp(self):
-    super().setUp()
-    self.config = finetune.get_config('JFTr50_solo')
-    self.sur_model = finetune_models.Finetune(self.config)
-
-  def test_evaluate(self):
+  @parameterized.named_parameters(('r50', 'imagenetr50'),
+                                  ('vitb16', 'imagenetvitB16'))
+  def test_evaluate(self, model_name):
     """Tests whether the model runs with no-error using dummy inputs."""
+    self.config = finetune.get_config(model_name)
+    self.sur_model = finetune_models.Finetune(self.config)
     dataset = tf.data.Dataset.from_tensor_slices(
         (tf.random.uniform([4, 240, 240, 3]),
          tf.random.uniform([4,], maxval=2, dtype=tf.int32))).batch(2)
-    results = self.sur_model.evaluate(self.config.learning, dataset, dataset,
-                                      False)
+    results = self.sur_model.evaluate(self.config.learning, dataset, dataset)
     print(results)
 
 
-class FinetuneFSTest(tf.test.TestCase):
+class FinetuneFSTest(parameterized.TestCase, tf.test.TestCase):
 
-  def setUp(self):
-    super().setUp()
-    self.config = finetune_fs.get_config('JFTr50_solo')
-    self.sur_model = finetune_fs_models.FinetuneFS(self.config)
-
-  def test_evaluate(self):
+  @parameterized.named_parameters(('r50', 'imagenetr50'),
+                                  ('vitb16', 'imagenetvitB16'))
+  def test_evaluate(self, model_name):
     """Tests whether the model runs with no-error using dummy inputs."""
+    self.config = finetune_fs.get_config(model_name)
+    self.sur_model = finetune_fs_models.FinetuneFS(self.config)
     dataset = tf.data.Dataset.from_tensor_slices(
         (tf.random.uniform([4, 240, 240, 3]),
          tf.random.uniform([4,], maxval=2, dtype=tf.int32))).batch(2)
-    results = self.sur_model.evaluate(self.config.learning, dataset, dataset,
-                                      False)
+    results = self.sur_model.evaluate(self.config.learning, dataset, dataset)
     print(results)
 
 if __name__ == '__main__':

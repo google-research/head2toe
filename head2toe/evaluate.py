@@ -50,7 +50,7 @@ def main(unused_argv):
   dataset_name = config.dataset
   FLAGS.output_dir = os.path.join(FLAGS.output_dir, dataset_name)
   if tf.io.gfile.exists(FLAGS.output_dir):
-    logging.warning('Results directory already exists!')
+    logging.warning('Results directory already exists!, %s', FLAGS.output_dir)
   tf.io.gfile.makedirs(FLAGS.output_dir)
   tf.io.gfile.makedirs(os.path.join(FLAGS.output_dir, 'pickle'))
 

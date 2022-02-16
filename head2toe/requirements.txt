@@ -3,4 +3,5 @@ numpy
 ml-collections
 sklearn
 tensorflow==2.7
+tf-hub-nightly
 -e git+https://github.com/google-research/task_adaptation.git#egg=task_adaptation

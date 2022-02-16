@@ -22,3 +22,4 @@ source env/bin/activate
 
 pip install -r head2toe/requirements.txt
 python -m head2toe.input_pipeline_test
+python -m head2toe.models.models_test
