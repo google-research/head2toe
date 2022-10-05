@@ -1,8 +1,10 @@
 # Head2Toe: Utilizing Intermediate Representations for Better OOD Generalization
-Code for reproducing our results in the Head2Toe paper.
+**Paper**: [goo.gle/h2t-paper](https://goo.gle/h2t-paper)
+**Video**: [goo.gle/h2t-video](https://goo.gle/h2t-video)
+
 <img src="https://github.com/google-research/head2toe/blob/main/imgs/h2t.png" alt="Head2Toe " width="80%" align="middle">
 
-**Paper**: [arxiv.org/abs/2201.03529](https://arxiv.org/abs/2201.03529)
+Code for reproducing our results in the Head2Toe paper.
 
 ## Setup
 First clone this repo.
@@ -84,6 +86,25 @@ python head2toe/evaluate.py \
 Set `config.learning.finetune_backbones` to true for enabling the finetuning of
 the backbone for any experiment. If you like to run any other experiments or
 if you have questions, feel free to create a new issue.
+
+## Citation
+```
+@InProceedings{evci22h2t,
+  title = 	 {{H}ead2{T}oe: Utilizing Intermediate Representations for Better Transfer Learning},
+  author =       {Evci, Utku and Dumoulin, Vincent and Larochelle, Hugo and Mozer, Michael C},
+  booktitle = 	 {Proceedings of the 39th International Conference on Machine Learning},
+  pages = 	 {6009--6033},
+  year = 	 {2022},
+  editor = 	 {Chaudhuri, Kamalika and Jegelka, Stefanie and Song, Le and Szepesvari, Csaba and Niu, Gang and Sabato, Sivan},
+  volume = 	 {162},
+  series = 	 {Proceedings of Machine Learning Research},
+  month = 	 {17--23 Jul},
+  publisher =    {PMLR},
+  pdf = 	 {https://proceedings.mlr.press/v162/evci22a/evci22a.pdf},
+  url = 	 {https://proceedings.mlr.press/v162/evci22a.html},
+}
+
+```
 
 ## Disclaimer
 This is not an officially supported Google product.

@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Lint as: python3
 r"""Finetune models for multi-backone inputs.
 """
 
@@ -133,6 +132,8 @@ class Finetune(tf.keras.Model):
 
       if self._learning_config.finetune_backbones:
         backbone = hub.KerasLayer(handle, trainable=True)
+      elif signature is None:
+        backbone = hub.KerasLayer(handle, trainable=False)
       else:
         backbone = hub.KerasLayer(
             handle, signature=signature, output_key=None,
@@ -293,7 +294,7 @@ class Finetune(tf.keras.Model):
           embeddings, mean, var, **bn_args)
     return embeddings
 
-  @tf.function(experimental_relax_shapes=True)
+  @tf.function(reduce_retracing=True)
   def _compute_loss_and_accuracy(self, output_head, logits, labels,
                                  global_batch_size=None):
     """Computes the loss and accuracy on an episode."""
