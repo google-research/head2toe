@@ -399,6 +399,7 @@ class Finetune(tf.keras.Model):
           normalization=learning_config.feature_normalization)
       logging.info('Support representation shape: %s',
                    support_representation.shape)
+      support_representation_ph = support_representation[:1]
     if query_dataset is None:
       query_labels = tf.constant([], dtype=support_labels.dtype)
     elif learning_config.cached_eval:
@@ -442,7 +443,7 @@ class Finetune(tf.keras.Model):
       optimizer = self._get_optimizer(learning_config, num_ways)
       output_head = self._init_training_vars(num_ways, learning_config)
       # Initialize the layer
-      output_head(support_representation[:1])
+      output_head(support_representation_ph)
 
     training_vars = output_head.trainable_variables
     if learning_config.finetune_backbones:

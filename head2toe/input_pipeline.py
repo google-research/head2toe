@@ -73,6 +73,7 @@ def create_vtab_dataset_balanced(dataset, image_size, batch_size,
   Returns:
     input_fn, input function to be passed to `tf.Estimator`.
   """
+  assert dataset in VTAB_TASKS
   dloader = data_loader.get_dataset_instance(
       {'dataset': dataset, 'data_dir': None})
   num_classes = dloader.get_num_classes()
@@ -159,3 +160,118 @@ def create_vtab_dataset(dataset, image_size, batch_size, mode,
       prefetch=1,
       train_examples=None,
   ).map(_dict_to_tuple)
+
+
+def create_vtab_dataset_legacy(dataset,
+                               image_size,
+                               batch_size,
+                               mode,
+                               eval_mode='test',
+                               valid_fold_id=4):
+  """Creates a VTAB input_fn using splits using the original VTAB paper.
+
+  Note that this function uses original Vtab-1k validation splits. In paper we
+  use train[800:1000] as validation for all datasets as implemented in
+  create_vtab_dataset.
+
+  Args:
+    dataset: str, VTAB task to evaluate on.
+    image_size: int
+    batch_size: int
+    mode: str in {'train', 'eval'}, whether to build the input function for
+      training or evaluation.
+    eval_mode: str in {'valid', 'test'}, whether to build the input functions
+      for validation or test runs.
+    valid_fold_id: int, 0 <= valid_fold_id < 5, valid_fold_id=4 corresponds to
+      the default value in VTAB.
+
+  Returns:
+    input_fn, input function to be passed to `tf.Estimator`.
+  """
+  assert 0 <= valid_fold_id < 5
+  assert dataset in VTAB_TASKS
+  dloader = data_loader.get_dataset_instance({
+      'dataset': dataset,
+      'data_dir': None
+  })
+  if mode not in ('train', 'eval'):
+    raise ValueError("mode should be 'train' or 'eval'")
+  is_training = mode == 'train'
+
+  def _dict_to_tuple(batch):
+    return batch['image'], batch['label']
+
+  if eval_mode == 'test':
+    split_name = 'train800val200' if is_training else 'test'
+  elif eval_mode == 'valid':
+
+    original_val = dloader._tfds_splits['val200']
+    original_train = dloader._tfds_splits['train800']
+    assert original_train == 'train[:800]'
+    # Following does 5 fold cross validation on the union of training and
+    # validation sets, which might not be optimal.
+    if valid_fold_id < 4:
+      val_start, val_end = valid_fold_id * 200, (valid_fold_id + 1) * 200
+      new_val = f'train[{val_start}:{val_end}]'
+      new_train = original_val
+      if val_start > 0:
+        new_train += f'+train[:{val_start}]'
+      if val_end < 800:
+        new_train += f'+train[{val_end}:800]'
+    else:
+      new_train, new_val = original_train, original_val
+    if is_training:
+      split_name = 'train800'
+      dloader._tfds_splits[split_name] = new_train
+    else:
+      split_name = 'val200'
+      dloader._tfds_splits[split_name] = new_val
+    logging.info('Using split_name: %s, %s', split_name,
+                 dloader._tfds_splits[split_name])
+
+  else:
+    raise ValueError(f'eval_mode: {eval_mode} invalid')
+
+  return dloader.get_tf_data(
+      split_name=split_name,
+      batch_size=batch_size,
+      preprocess_fn=functools.partial(
+          data_loader.preprocess_fn, input_range=(-1.0, 1.0), size=image_size),
+      epochs=0,
+      drop_remainder=False,
+      for_eval=not is_training,
+      # Our training data has at most 1000 samples, therefore a shuffle buffer
+      # size of 1000 is sufficient.
+      shuffle_buffer_size=1000,
+      prefetch=1,
+      train_examples=None,
+  ).map(_dict_to_tuple)
+
+
+VTAB_NATURAL_TASKS = [
+    'data.caltech101',
+    'data.cifar(num_classes=100)',
+    'data.dtd',
+    'data.oxford_flowers102',
+    'data.oxford_iiit_pet',
+    'data.sun397',
+    'data.svhn',
+]
+VTAB_SPECIALIZED_TASKS = [
+    'data.patch_camelyon',
+    'data.eurosat',
+    'data.resisc45',
+    'data.diabetic_retinopathy(config="btgraham-300")',
+]
+VTAB_STRUCTURED_TASKS = [
+    'data.clevr(task="count_all")',
+    'data.clevr(task="closest_object_distance")',
+    'data.dmlab',
+    'data.dsprites(predicted_attribute="label_x_position",num_classes=16)',
+    'data.dsprites(predicted_attribute="label_orientation",num_classes=16)',
+    'data.kitti(task="closest_vehicle_distance")',
+    'data.smallnorb(predicted_attribute="label_azimuth")',
+    'data.smallnorb(predicted_attribute="label_elevation")',
+]
+
+VTAB_TASKS = VTAB_NATURAL_TASKS + VTAB_SPECIALIZED_TASKS + VTAB_STRUCTURED_TASKS
