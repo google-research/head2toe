@@ -2,6 +2,6 @@ absl-py
 numpy
 ml-collections
 sklearn
-tensorflow==2.7
+tensorflow==2.12.1
 tf-hub-nightly
 -e git+https://github.com/google-research/task_adaptation.git#egg=task_adaptation
